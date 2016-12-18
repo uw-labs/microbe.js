@@ -1,8 +1,33 @@
-const instrumentation = require('@utilitywarehouse/uw-lib-prometheus.js');
+const Instrumentation = require('@utilitywarehouse/uw-lib-prometheus.js');
 const auth = require('@utilitywarehouse/uw-lib-auth.js');
 const bunyan = require('bunyan');
 const express = require('express');
 const uuid = require('uuid');
+
+const safeCycles = bunyan.safeCycles;
+
+// modified from https://github.com/trentm/node-bunyan/blob/master/examples/specific-level-streams.js
+class RecordWriter {
+	constructor(levels, stream) {
+		this.levels = {};
+		levels.forEach(lvl => {
+			this.levels[bunyan.resolveLevel(lvl)] = true;
+		});
+		this.stream = stream;
+	}
+
+	mapLevelToString(lvl) {
+		return bunyan.nameFromLevel[lvl];
+	}
+
+	write(record) {
+		if (this.levels[record.level] !== undefined) {
+			record.severity = this.mapLevelToString(record.level);
+			const str = JSON.stringify(record, safeCycles()) + '\n';
+			this.stream.write(str);
+		}
+	}
+}
 
 class Microbe {
 	constructor(name) {
@@ -15,16 +40,30 @@ class Microbe {
 
 	_buildLogger() {
 		function errSerializer(err) {
-			return {type: err.type, status: err.status, message: err.message, previous: err.previous ? errSerializer(err.previous) : null}
+			return {type: err.type, status: err.status, message: err.message, previous: err.previous ? errSerializer(err.previous) : null};
 		}
 		const logger = bunyan.createLogger({
 			name: this._name,
-			serializers: {err: errSerializer , req: bunyan.stdSerializers.req},
+			serializers: {err: errSerializer, req: bunyan.stdSerializers.req},
 			level: bunyan.TRACE,
-			streams: [{
-        stream: process.stderr,
-        level: bunyan.ERROR
-      }]
+			streams: [
+				{
+					type: 'raw',
+					stream: new RecordWriter(
+          [bunyan.ERROR, bunyan.FATAL],
+          process.stderr
+        ),
+					level: bunyan.ERROR
+				},
+				{
+					type: 'raw',
+					stream: new RecordWriter(
+          [bunyan.TRACE, bunyan.INFO, bunyan.DEBUG, bunyan.WARN],
+          process.stdout
+        ),
+					level: bunyan.TRACE
+				}
+			]
 		});
 
 		return logger;
@@ -50,7 +89,7 @@ class Microbe {
 	}
 
 	_buildInstrumentation() {
-		const prom = new instrumentation();
+		const prom = new Instrumentation();
 		prom.newGauge(
 			'nodejs_memory_heap_used_bytes',
 			'process.memoryUsage().heapUsed'
@@ -63,15 +102,15 @@ class Microbe {
 			'http_request_seconds',
 			'Measures request duration',
 			['http_status', 'route', 'http_method'],
-			{ buckets: [0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5, 10] }
+			{buckets: [0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5, 10]}
 		);
 		return prom;
 	}
 
 	enableAccessLog() {
 		this.server.use((req, res, next) => {
-    	(req.logger || this.logger).trace({req});
-    	next();
+			(req.logger || this.logger).trace({req});
+			next();
 		});
 	}
 
@@ -114,18 +153,17 @@ class Microbe {
 	}
 
 	start(port, callback) {
-		this.server.use((error, req, res, next) => {
-			//no more error chainging
+		this.server.use((error, req, res, next) => { // eslint-disable-line no-unused-vars
+			// no more error chainging
 			return;
-		})
+		});
 		return this.server.listen(port, () => {
 			this.logger.info(`${this.name} listening on 0.0.0.0:${port}`);
 			if (callback) {
 				callback();
 			}
-		})
+		});
 	}
 }
-
 
 module.exports = Microbe;
