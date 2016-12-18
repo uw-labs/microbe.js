@@ -158,7 +158,7 @@ class Microbe {
 			return;
 		});
 		return this.server.listen(port, () => {
-			this.logger.info(`${this.name} listening on 0.0.0.0:${port}`);
+			this.logger.info(`${this.name} listening on http://0.0.0.0:${port}`);
 			if (callback) {
 				callback();
 			}
