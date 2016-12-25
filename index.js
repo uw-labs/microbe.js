@@ -1,8 +1,10 @@
 const Instrumentation = require('@utilitywarehouse/uw-lib-prometheus.js');
 const auth = require('@utilitywarehouse/uw-lib-auth.js');
+const operational = require('@utilitywarehouse/uw-lib-operational.js');
 const bunyan = require('bunyan');
 const express = require('express');
 const uuid = require('uuid');
+const path = require('path');
 
 const safeCycles = bunyan.safeCycles;
 
@@ -30,12 +32,19 @@ class RecordWriter {
 }
 
 class Microbe {
-	constructor(name) {
+	constructor(name, root) {
+		this._root = root || process.cwd();
 		this._name = name;
+		this._logger = this._buildLogger();
+		try {
+			this._package = require(path.join(this._root, 'package.json'));
+		} catch(err) {
+			this._logger.warn({err}, 'Unable to load package.json');
+			this._package = {}
+		}
 		this._instrumentation = this._buildInstrumentation();
 		this._auth = auth;
 		this._server = this._buildServer();
-		this._logger = this._buildLogger();
 	}
 
 	_buildLogger() {
@@ -69,11 +78,33 @@ class Microbe {
 		return logger;
 	}
 
+	_buildOperationalEndpoints(server) {
+		const about = new operational.About();
+		about.setMeta(this._name, this._package.description);
+		if (this._package.author) {
+			about.addOwner({name: this._package.author});
+		}
+		if (this._package.homepage) {
+			about.addLink('readme', this._package.homepage);
+		}
+		try {
+			about.fromFile(path.join(this._root, 'build.json'));
+		} catch(err) {
+			this._logger.warn({err}, 'Unable to load build.json');
+		}
+		const health = new operational.Health(this._name, this._package.description || this._name);
+		const ready = new operational.Ready();
+		server.use('/__/about', about.handler);
+		server.use('/__/health', health.handler);
+		server.use('/__/ready', ready.handler);
+
+		this._operational = {about, health, ready};
+	}
+
 	_buildServer() {
 		const promMiddleware = this.instrumentation.middleware();
 		const server = express();
-		server.get('/__/status', (req, res) => res.status(200).send('OK'));
-		server.get('/__/ready', (req, res) => res.status(200).send('OK'));
+		this._buildOperationalEndpoints(server);
 		server.get(
 			'/__/metrics',
 			promMiddleware.heapUsage('nodejs_memory_heap_used_bytes', 'nodejs_memory_heap_total_bytes'),
@@ -150,6 +181,10 @@ class Microbe {
 
 	get auth() {
 		return this._auth;
+	}
+
+	get operational() {
+		return this._operational;
 	}
 
 	start(port, callback) {

@@ -26,8 +26,14 @@ service.server.get('/ok', (req, res) => {
 	res.json({ok: true});
 });
 
+service.server.get('/error', (req, res) => {
+	throw new Error('Example error');
+});
+
 service.enableErrorLog();
 service.enableErrorHandler();
+
+service.operational.health.addCheck('API', (r) => r.healthy('API available.'));
 
 service.start(3031, () => {
 	service.logger.info('Start callback.');
@@ -37,7 +43,7 @@ service.start(3031, () => {
 
 ## API
 
-- `new Microbe(name)` - create an instance of a service passing it's name (used for loggers etc.)
+- `new Microbe(name, [root = process.cwd()])` - create an instance of a service passing it's name (used for loggers etc.) and root directory (for operational endpoitns etc.)
 - `Microbe.name : string` - getter only, returns service name
 - `Microbe.logger : Bunyan`  - getter only, returns instance of Bunyan logger
 - `Microbe.server : Express` - getter only, returns an instance of express
@@ -48,6 +54,7 @@ service.start(3031, () => {
 - `Microbe.enableErrorLog : void` - enables error logging to stdErr, will log status, message and any previous exceptions in the same format
 - `Microbe.enableAuth(Provider) : void` - enables authentication middleware, accepts a configured instance of uw-lib-auth.js/Provider
 - `Microbe.enableErrorHandler : void` - enables rendering of Errors back to the client as a {status, message} JSON string
+- `Microbe.operational : {health, about, ready}` - returns bridge to operational checks
 
 ## Logging
 
@@ -67,9 +74,10 @@ Error logs use customer serialization where only message and status are plucked.
 
 Microbe provides simple bridging into uw-lib-auth, for specifics refer to uw-lib-auth documentation.
 
-## Health endpoints
+## Operational endpoints
 
-As standard, there are `/__/status` and `/__/ready` provided. Both return simple 200 status with OK body.
+Microbe provides preconfigured bridging into uw-lib-operational, for specifics refer to uw-lib-auth documentation. Standard preconfiguration will try to read details from package.json (failing silently) and derive information from it (name, description, author, links etc), will also try to read `build.json` file looking for build information. 
+
 
 ## Error middleware
 

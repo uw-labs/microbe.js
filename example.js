@@ -15,12 +15,17 @@ service.enableAuth(
 );
 
 service.server.get('/ok', (req, res) => {
-	throw new Error('asd');
 	res.json({ok: true});
+});
+
+service.server.get('/error', (req, res) => {
+	throw new Error('Example error');
 });
 
 service.enableErrorLog();
 service.enableErrorHandler();
+
+service.operational.health.addCheck('API', (r) => r.healthy('API available.'));
 
 service.start(3031, () => {
 	service.logger.info('Start callback.');

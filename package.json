@@ -1,7 +1,7 @@
 {
   "name": "@utilitywarehouse/uw-microbe.js",
   "description": "Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/utilitywarehouse/uw-microbe.js.git"
   },
-  "author": "",
+  "author": "Utility Warehouse Web Systems <it-websystems@utilitywarehouse.co.uk>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/utilitywarehouse/uw-microbe.js/issues"
@@ -18,6 +18,7 @@
   "homepage": "https://github.com/utilitywarehouse/uw-microbe.js#readme",
   "dependencies": {
     "@utilitywarehouse/uw-lib-auth.js": "^1.1.2",
+    "@utilitywarehouse/uw-lib-operational.js": "^1.0.0",
     "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.8",
     "bunyan": "^1.8.5",
     "express": "^4.14.0",
