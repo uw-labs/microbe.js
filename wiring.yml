@@ -1,0 +1,43 @@
+components:
+  package: {module: './package.json'}
+  logger:
+    factory: '__/node_modules/@utilitywarehouse/uw-lib-logger.js'
+    with:
+      - {name: '@package::name'}
+  instrumentation:
+    class: '__/node_modules/@utilitywarehouse/uw-lib-prometheus.js'
+    call:
+      - method: newGauge
+        with: ['nodejs_memory_heap_used_bytes', 'process.memoryUsage().heapUsed']
+      - method: newGauge
+        with: ['nodejs_memory_heap_total_bytes', 'process.memoryUsage().heapTotal']
+      - method: newHistogram
+        with:
+          - 'http_request_seconds'
+          - 'Measures request duration'
+          - ['http_status', 'route', 'http_method']
+          - {buckets: [0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5, 10]}
+  operational.about:
+    class: '__/node_modules/@utilitywarehouse/uw-lib-operational.js::About'
+    call:
+      - {method: 'setMeta', with: ['@package::name', '@package::description']}
+      - {method: 'addOwner', with: ['@package::author']}
+      - {method: 'addLink', with: ['readme', '@package::homepage']}
+  operational.health:
+    class: '__/node_modules/@utilitywarehouse/uw-lib-operational.js::Health'
+    with: ['@package::name', '@package::description']
+  operational.ready:
+    class: '__/node_modules/@utilitywarehouse/uw-lib-operational.js::Ready'
+  router:
+    class: '__/node_modules/express::Router'
+  pre.router:
+    class: '__/node_modules/express::Router'
+  post.router:
+    class: '__/node_modules/express::Router'
+  server:
+    factory: '__/node_modules/express'
+  bus:
+    class: '__/node_modules/director.js'
+    call:
+      - method: setRegistry
+        with: ['@canister']
