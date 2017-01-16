@@ -34,6 +34,22 @@ class DI {
 			this.builder.addDefinition(definition);
 		}
 
+		const preRouter = this.builder.getDefinitionById('pre.router');
+
+		this.builder.getDefinitionsByTag('before.router').forEach(definition => {
+			preRouter.addCall(
+				canister.Definition.call('use', definition)
+			)
+		});
+
+		const postRouter = this.builder.getDefinitionById('post.router');
+
+		this.builder.getDefinitionsByTag('after.router').forEach(definition => {
+			postRouter.addCall(
+				canister.Definition.call('use', definition)
+			)
+		});
+
 		return this.builder.build();
 	}
 }

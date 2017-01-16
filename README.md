@@ -37,6 +37,14 @@ Endpoints exposed via default `/__/{name}` routes. You can configure your checks
 
 Check [wiring.yml](wiring.yml) for additional services.
 
+### Wiring
+
+For reference on wiring go to https://github.com/michael-donat/canister.js
+
+### Before/After ware
+
+Those can be added by either using your the API or tagging services with `before.router` and `after.router`.  
+
 ## Example
 
 ```nodejs
