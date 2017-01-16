@@ -1,10 +1,9 @@
-const canister = require('canister.js');
 const path = require('path');
 const uuid = require('uuid');
+const canister = require('canister.js');
 
 class DI {
 	constructor(root) {
-
 		if (!root) {
 			root = process.cwd();
 		}
@@ -39,7 +38,7 @@ class DI {
 		this.builder.getDefinitionsByTag('before.router').forEach(definition => {
 			preRouter.addCall(
 				canister.Definition.call('use', definition)
-			)
+			);
 		});
 
 		const postRouter = this.builder.getDefinitionById('post.router');
@@ -47,7 +46,7 @@ class DI {
 		this.builder.getDefinitionsByTag('after.router').forEach(definition => {
 			postRouter.addCall(
 				canister.Definition.call('use', definition)
-			)
+			);
 		});
 
 		return this.builder.build();
@@ -124,7 +123,7 @@ module.exports = class Microbe {
 	start(port) {
 		this.server.listen(port, () => {
 			this.logger.info(`${this.name} listening on http://0.0.0.0:${port}`);
-		})
+		});
 	}
 
 	before(middleware) {
@@ -146,4 +145,4 @@ module.exports = class Microbe {
 	ready(middleware) {
 		this.container.get('operational.ready').onCall(middleware);
 	}
-}
+};
