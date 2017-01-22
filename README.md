@@ -66,3 +66,24 @@ system.pre.use((req, res, next) => {
 
 system.start(3321);
 ```
+
+## Behaviour
+
+```
+  Microbe
+    ✓ sets up default instrumentation
+    ✓ renders errors with error.status and error.message only with http status matching error.status
+    ✓ renders 500/Internal Server Error when no error.status / error.message
+    ✓ can run before() and after() middleware
+    exposes operational endpoints at
+      ✓ /__/about
+      ✓ /__/ready
+      ✓ /__/health
+      ✓ /__/metrics
+    provides a logger that
+      ✓ is namespaced with app name
+      ✓ attaches to req.logger with correlation id (id) and request id (r)
+      ✓ logs requests
+      ✓ logs errors with stacks and previous errors
+
+```

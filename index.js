@@ -15,9 +15,9 @@ class DI {
 
 		yamlLoader.fromFile(path.join(__dirname, './wiring.yml'));
 
-		const parser = new canister.Parser(yamlLoader.toJS(), __dirname);
+		const parser = new canister.Parser(__dirname);
 
-		for (let definition of parser.parse()) {
+		for (let definition of parser.parse(yamlLoader.toJS())) {
 			builder.addDefinition(definition);
 		}
 
@@ -27,9 +27,17 @@ class DI {
 	}
 
 	build() {
-		const parser = new canister.Parser(this.loader.toJS());
+		const parser = new canister.Parser();
 
-		for (let definition of parser.parse()) {
+		const env = new canister.definitionLoader.Environment();
+
+		env.load();
+
+		for (let definition of parser.parse(this.loader.toJS())) {
+			this.builder.addDefinition(definition);
+		}
+
+		for (let definition of parser.parse(env.toJS())) {
 			this.builder.addDefinition(definition);
 		}
 
@@ -100,13 +108,18 @@ module.exports = class Microbe {
 		this.server.use(this.router);
 		this.server.use(this.post);
 
-		this.server.use((err, req, res, next) => {
-			(req.logger || this.logger).error({err});
-			next(err);
+		this.server.use((error, req, res, next) => {
+			(req.logger || this.logger).error({error});
+			next(error);
 		});
 
 		this.server.use((error, req, res, next) => {
-			res.status(error.status || 500).json({status: error.status || 500, message: error.message || 'Internal Server Error'});
+			const err = {
+				status: error.status || 500,
+				type: error.type || (error.name || 'ServerError'),
+				message: error.message || 'Internal Server Error'
+			};
+			res.status(err.status).json(err);
 			next(error);
 		});
 
@@ -138,8 +151,8 @@ module.exports = class Microbe {
 		return this.router;
 	}
 
-	health(middleware) {
-		this.container.get('operational.health').addCheck(middleware);
+	health(name, middleware) {
+		this.container.get('operational.health').addCheck(name, middleware);
 	}
 
 	ready(middleware) {
