@@ -2,6 +2,51 @@ const path = require('path');
 const uuid = require('uuid');
 const canister = require('canister.js');
 
+class LifecycleDICycle {
+	execute(builder) {
+
+		const cycleDefinition = builder.getDefinitionById('system.lifecycle');
+
+		for (let callDetails of this.cycleByTag(builder, 'system.start')) {
+			cycleDefinition.addCall(
+				canister.Definition.call('registerStart', ...callDetails)
+			);
+		}
+
+		for (let callDetails of this.cycleByTag(builder, 'system.stop')) {
+			cycleDefinition.addCall(
+				canister.Definition.call('registerStop', ...callDetails)
+			);
+		}
+
+	}
+
+	* cycleByTag(builder, tag) {
+		const startDefinitions = builder.getDefinitionsByTag(tag);
+		for(let d of startDefinitions) {
+			let t = d.getTag(tag).value;
+			let priority = 0;
+			let method = canister.Definition.reference(d.id);
+			let context = canister.Definition.value(undefined);
+			if (t === undefined || t === null || !isNaN(t)) {
+				priority = t || 0;
+			} else {
+
+				if (t.priority) {
+					priority = t.priority;
+				}
+
+				if (t.method) {
+					method = canister.Definition.value(t.method);
+					context = canister.Definition.reference(d.id);
+				}
+			}
+
+			yield [canister.Definition.value(priority), method, context]
+		}
+	}
+}
+
 class DI {
 	constructor(root) {
 		if (!root) {
@@ -20,6 +65,8 @@ class DI {
 		for (let definition of parser.parse(yamlLoader.toJS())) {
 			builder.addDefinition(definition);
 		}
+
+		builder.addCycle(new LifecycleDICycle());
 
 		this.builder = builder;
 
@@ -157,5 +204,13 @@ module.exports = class Microbe {
 
 	ready(middleware) {
 		this.container.get('operational.ready').onCall(middleware);
+	}
+
+	bootstrap() {
+		return this.container.get('system.lifecycle').start();
+	}
+
+	teardown() {
+		return this.container.get('system.lifecycle').stop();
 	}
 };

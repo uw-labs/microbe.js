@@ -41,3 +41,5 @@ components:
     call:
       - method: setRegistry
         with: ['@canister']
+  system.lifecycle:
+    class: '__/lifecycle'

@@ -1,7 +1,10 @@
 # uw-microbe.js
 
-Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/utilitywarehouse/uw-microbe.js/master/logo.jpg" alt="microbe.js"/>
+</p>
 
+Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.
 
 ## API
 
@@ -15,6 +18,8 @@ Microbe is an abstraction for the repetitive task of setting basic express infra
 - `Microbe.route() : express.Router` - returns an instance of Router, attach your handlers here
 - `Microbe.health(callback)` - adds a health checker per uw-lib-operational.js
 - `Microbe.ready(callback)` - sets a ready checker per uw-lib-operational.js
+- `Microbe.bootstrap() : Promise` - runs bootstrap methods (if any) in order and returns Promise
+- `Microbe.teardown() : Promise` - runs teardown methods (if any) in reverse order and returns Promise
 
 
 ## Bits out of the box
@@ -66,6 +71,42 @@ system.pre.use((req, res, next) => {
 
 system.start(3321);
 ```
+
+## System lifecycle
+
+It is possible to define startup and shutdown methods via container configuration. Microbe exposes `bootstrap` and `teardown` methods to trigger the behaviour.
+
+Definition:
+
+```yml
+components:
+  mysql:
+    module: './mysql'
+    tags:
+      system.start: ~
+  redis:
+    module: './redis'
+    tags:
+      system.start: 2
+  mongo:
+    class: './mongo'
+    tags:
+      system.start: {method: start, priority: 3}
+      system.stop: {method: stop}
+```
+
+- `myssql` will be with priority 0 and the startup method will be the one returned from the module (`require('./mysql')()`)
+- `redis` will be started with priority 2 and the startup method will be the one returned from the module (as above)
+- `mongo` will be started with priority 3 and the startup method will be `start` executed in `mongo` context (no constructor manual needed, `this` will be `mongo`)
+- `mongo` will shutdown with priority 0 (reverse order), method is `stop` bound to `mongo`
+
+Order is **NOT** guaranteed if two services have the same priority.
+ 
+Start/Stop methods are executed in series, **always**. 
+
+Provided start/stop methods are **required** to return a promise.
+
+Where a start/stop method rejects the entire chain will be rejected.
 
 ## Behaviour
 
