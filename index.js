@@ -4,7 +4,6 @@ const canister = require('canister.js');
 
 class LifecycleDICycle {
 	execute(builder) {
-
 		const cycleDefinition = builder.getDefinitionById('system.lifecycle');
 
 		for (let callDetails of this.cycleByTag(builder, 'system.start')) {
@@ -18,12 +17,11 @@ class LifecycleDICycle {
 				canister.Definition.call('registerStop', ...callDetails)
 			);
 		}
-
 	}
 
 	* cycleByTag(builder, tag) {
 		const startDefinitions = builder.getDefinitionsByTag(tag);
-		for(let d of startDefinitions) {
+		for (let d of startDefinitions) {
 			let t = d.getTag(tag).value;
 			let priority = 0;
 			let method = canister.Definition.reference(d.id);
@@ -31,7 +29,6 @@ class LifecycleDICycle {
 			if (t === undefined || t === null || !isNaN(t)) {
 				priority = t || 0;
 			} else {
-
 				if (t.priority) {
 					priority = t.priority;
 				}
@@ -42,7 +39,7 @@ class LifecycleDICycle {
 				}
 			}
 
-			yield [canister.Definition.value(priority), method, context]
+			yield [canister.Definition.value(priority), method, context];
 		}
 	}
 }
