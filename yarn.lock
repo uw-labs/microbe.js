@@ -2,9 +2,15 @@
 # yarn lockfile v1
 
 
-"@utilitywarehouse/uw-lib-logger.js@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-logger.js/-/uw-lib-logger.js-1.1.0.tgz#ddf9335179742eb72471ebc8cc4ad6299c26899a"
+"@utilitywarehouse/uw-lib-error.js@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-error.js/-/uw-lib-error.js-1.0.1.tgz#2c3b3463c0ccb844a7aa8fa97792d3ae56806a92"
+  dependencies:
+    uuid "^3.0.1"
+
+"@utilitywarehouse/uw-lib-logger.js@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-logger.js/-/uw-lib-logger.js-1.1.1.tgz#524ff9fdb7e601d27f60d43046c29f1f231f400a"
   dependencies:
     bunyan "^1.8.5"
     merge "^1.2.0"

@@ -164,7 +164,8 @@ module.exports = class Microbe {
 			const err = {
 				status: error.status || 500,
 				type: error.type || (error.name || 'ServerError'),
-				message: error.message || 'Internal Server Error'
+				message: error.message || 'Internal Server Error',
+				reference: error.reference
 			};
 			res.status(err.status).json(err);
 			next(error);

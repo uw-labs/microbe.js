@@ -4,6 +4,7 @@ const request = require('supertest');
 const Microbe = require('.');
 const expect = chai.expect;
 const pkg = require('./package.json');
+const error = require('@utilitywarehouse/uw-lib-error.js');
 
 class LoggerStream extends stream.Writable {
 
@@ -124,10 +125,8 @@ describe('Microbe', function() {
 	})
 	it('renders errors with error.status and error.message only with http status matching error.status', function(done) {
 		this.system.route().get('/', (req, res) => {
-			const e = new Error('na-ah');
-			e.type = 'NotFoundError';
-			e.status = 400;
-			throw e;
+			const e = error('NotFoundError', 400);
+			throw new e('na-ah');
 		})
 		request(this.system.server)
 			.get('/')
@@ -135,6 +134,7 @@ describe('Microbe', function() {
 				expect(res.body).to.have.property('message', 'na-ah');
 				expect(res.body).to.have.property('status', 400);
 				expect(res.body).to.have.property('type', 'NotFoundError');
+				expect(res.body).to.have.property('reference');
 				done();
 			});
 	});

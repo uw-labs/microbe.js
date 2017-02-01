@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/utilitywarehouse/uw-microbe.js#readme",
   "dependencies": {
-    "@utilitywarehouse/uw-lib-logger.js": "^1.1.0",
+    "@utilitywarehouse/uw-lib-error.js": "^1.0.1",
+    "@utilitywarehouse/uw-lib-logger.js": "^1.1.1",
     "@utilitywarehouse/uw-lib-operational.js": "^1.0.0",
     "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.9",
     "async.eachseries": "^0.5.2",
