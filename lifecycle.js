@@ -35,7 +35,6 @@ module.exports = class SystemLifecycle {
 	}
 
 	start() {
-		console.log(this.startMethods.sort((a, b) => {return a.priority - b.priority}))
 		return new Promise((resolve, reject) => {
 			eachSeries(
 				this.startMethods.sort((a, b) => a.priority - b.priority),

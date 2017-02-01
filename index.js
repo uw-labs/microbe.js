@@ -211,4 +211,8 @@ module.exports = class Microbe {
 	teardown() {
 		return this.container.get('system.lifecycle').stop();
 	}
+
+	get(service) {
+		return this.container.get(service);
+	}
 };
