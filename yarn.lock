@@ -9,6 +9,10 @@
     async "^2.1.2"
     jsonwebtoken "^7.1.9"
 
+"@utilitywarehouse/uw-lib-authz.js@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-authz.js/-/uw-lib-authz.js-1.0.0.tgz#92b7f222eaf29f8d0310c5467358b5dd84332204"
+
 "@utilitywarehouse/uw-lib-error.js@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-error.js/-/uw-lib-error.js-1.0.1.tgz#2c3b3463c0ccb844a7aa8fa97792d3ae56806a92"
