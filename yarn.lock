@@ -291,9 +291,9 @@ camelcase@^2.0.0, camelcase@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-2.1.1.tgz#7c1d16d679a1bbe59ca02cacecfb011e201f5a1f"
 
-canister.js@^1.7.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/canister.js/-/canister.js-1.7.2.tgz#2a7bb5986d9beb6fdfd5a9b9994a1b016b08c0b6"
+canister.js@^1.7.4:
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/canister.js/-/canister.js-1.7.4.tgz#6d19b4172031b18be702114ae529a35f919c9754"
   dependencies:
     dependency-graph "^0.5.0"
     js-yaml "^3.7.0"
