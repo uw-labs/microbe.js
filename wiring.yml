@@ -8,6 +8,8 @@ components:
     class: '@utilitywarehouse/uw-lib-prometheus.js'
     call:
       - method: newGauge
+        with: ['infrastructure_accessible', 'reports when infra is up/down', ['probe']]
+      - method: newGauge
         with: ['nodejs_memory_heap_used_bytes', 'process.memoryUsage().heapUsed']
       - method: newGauge
         with: ['nodejs_memory_heap_total_bytes', 'process.memoryUsage().heapTotal']
@@ -43,3 +45,18 @@ components:
         with: ['@canister']
   system.lifecycle:
     class: '__/lifecycle'
+  system.monitor.driver:
+    class: '@utilitywarehouse/uw-lib-connection-monitor.js'
+  system.monitor:
+    class: '__/monitor'
+    with:
+      - '@system.monitor.driver'
+      - '@logger'
+      - '@instrumentation'
+      - 'infrastructure_accessible'
+      - '@operational.health'
+      - '@canister'
+    tags:
+      system.start:
+        priority: 99999999
+        method: start

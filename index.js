@@ -2,6 +2,34 @@ const path = require('path');
 const uuid = require('uuid');
 const canister = require('canister.js');
 
+class MonitorDICycle {
+	execute(builder) {
+		const monitorDefinition = builder.getDefinitionById('system.monitor');
+
+		for (let callDetails of this.tags(builder)) {
+			monitorDefinition.addCall(
+				canister.Definition.call('register', callDetails)
+			);
+		}
+	}
+
+	* tags(builder) {
+		const definitions = builder.getDefinitionsByTag('system.monitor');
+		for (let d of definitions) {
+			let t = d.getTag('system.monitor').value;
+
+			const serviceId = d.id;
+			const prop = t.prop;
+			const name = t.name || d.id;
+			const type = t.type;
+			const isRequired = t.required || false;
+			const isInitiallyConnected = t.initiallyConnected || true;
+
+			yield canister.Definition.structure({serviceId, prop, name, type, isRequired, isInitiallyConnected});
+		}
+	}
+}
+
 class LifecycleDICycle {
 	execute(builder) {
 		const cycleDefinition = builder.getDefinitionById('system.lifecycle');
@@ -64,6 +92,7 @@ class DI {
 		}
 
 		builder.addCycle(new LifecycleDICycle());
+		builder.addCycle(new MonitorDICycle());
 
 		this.builder = builder;
 
