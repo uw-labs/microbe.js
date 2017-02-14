@@ -108,6 +108,44 @@ Provided start/stop methods are **required** to return a promise.
 
 Where a start/stop method rejects the entire chain will be rejected.
 
+## Monitoring
+
+Microbe can monitor your infrastructure connections and have state pumped onto logger, instrumentation and health endpoints. 
+There are only two types of events recognised, `connected` and `disconnected` and any instance provided for monitoring is required to raise those. 
+Patch methods for redis and mongo are available and will translate events to the required pair.
+
+Definition:
+
+```yml
+components:
+  redis:
+    module: './redis'
+    tags:
+      system.start: 2
+      system.monitor:
+        type: redis
+        prop: cache
+        initiallyConnected: true
+  mongo:
+    class: './mongo'
+    tags:
+      system.start: {method: start, priority: 3}
+      system.stop: {method: stop}
+      system.monitor:
+        type: mongo
+        prop: db
+        required: true
+        initiallyConnected: true
+```
+
+Syntax:
+
+- `type` - optional, redis or mongo, if left blank it will try to monitor connected/disconnected events on passed instance
+- `prop` - optional, the prop of the service where the events are emitted from, this is required  because we often have wrappers around connection objects
+- `name` - optional, arbitrary name, will be used as label in any output type - defaults to component definition id (service name)
+- `required` - optional, if set to true and connection is down it will report system as unhealthy in health checks, default is false
+- `initiallyConnected` - optional, it will set the probe to connected after creation, this is because a lot of the connection objects do not emit connection events, default is true
+
 ## Behaviour
 
 ```
