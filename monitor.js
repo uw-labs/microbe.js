@@ -59,20 +59,22 @@ module.exports = class {
 					this.logger.info({probe: p.name}, `${p.name} connected.`)
 					this.metric.set({probe: p.name}, 1)
 				});
-				p.on('disconnected', () => {
-					this.logger.info({probe: p.name}, `${p.name} disconnected.`)
+				p.on('disconnected', (event) => {
+					let reason = event.message || '';
+					this.logger.info({probe: p.name, reason}, `${p.name} disconnected.`)
 					this.metric.set({probe: p.name}, 0)
 				});
 				this.healthCheck.addCheck(p.name, (r) => {
+					let reason = p.details && p.details.message ? p.details.message : '';
 					if (!p.connected && p.isRequired) {
 						r.unhealthy(
-							`${p.name} disconnected.`,
+							reason || `${p.name} disconnected.`,
 							`check ${p.name}.`,
 							`${p.name} unavailable.`
 						)
 					} else if (!p.connected) {
 						r.degraded(
-							`${p.name} disconnected.`,
+							reason || `${p.name} disconnected.`,
 							`check ${p.name}.`
 						)
 					} else {
