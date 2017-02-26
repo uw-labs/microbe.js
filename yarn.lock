@@ -23,9 +23,9 @@
   dependencies:
     uuid "^3.0.1"
 
-"@utilitywarehouse/uw-lib-logger.js@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-logger.js/-/uw-lib-logger.js-1.1.2.tgz#3e2c0785f8dc813f509b14f7d9e4fbb603fad7fe"
+"@utilitywarehouse/uw-lib-logger.js@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-logger.js/-/uw-lib-logger.js-1.1.3.tgz#4f592d95f65ce380b1997b068bc9d740fe3e99c5"
   dependencies:
     bunyan "^1.8.5"
     merge "^1.2.0"
