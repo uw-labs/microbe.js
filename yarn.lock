@@ -17,9 +17,9 @@
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-connection-monitor.js/-/uw-lib-connection-monitor.js-1.0.4.tgz#9903288847d63867fbe63a80c490129ad5dd713b"
 
-"@utilitywarehouse/uw-lib-endpoint-monitor.js@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-endpoint-monitor.js/-/uw-lib-endpoint-monitor.js-1.0.2.tgz#994951b0c92790ccded1fd7443152bec50475fda"
+"@utilitywarehouse/uw-lib-endpoint-monitor.js@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-endpoint-monitor.js/-/uw-lib-endpoint-monitor.js-1.0.3.tgz#4ea9f6e5b6b110eb5d856c9a75e109c9a14599a4"
   dependencies:
     axios "^0.15.3"
 
