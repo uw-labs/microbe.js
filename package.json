@@ -21,7 +21,7 @@
     "@utilitywarehouse/uw-lib-auth.js": "^1.1.3",
     "@utilitywarehouse/uw-lib-authz.js": "^1.0.0",
     "@utilitywarehouse/uw-lib-connection-monitor.js": "^1.0.4",
-    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.1",
+    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.2",
     "@utilitywarehouse/uw-lib-error.js": "^1.0.1",
     "@utilitywarehouse/uw-lib-logger.js": "^1.1.3",
     "@utilitywarehouse/uw-lib-operational.js": "^1.0.0",
