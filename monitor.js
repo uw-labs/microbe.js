@@ -60,7 +60,7 @@ module.exports = class {
 					this.metric.set({probe: p.name}, 1)
 				});
 				p.on('disconnected', (event) => {
-					let reason = event.message || '';
+					let reason = event ? event.message : '';
 					this.logger.info({probe: p.name, reason}, `${p.name} disconnected.`)
 					this.metric.set({probe: p.name}, 0)
 				});
