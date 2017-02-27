@@ -1,7 +1,7 @@
 {
   "name": "@utilitywarehouse/uw-microbe.js",
   "description": "Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.",
-  "version": "2.0.19",
+  "version": "2.0.20",
   "main": "index.js",
   "scripts": {
     "test": "make test",
