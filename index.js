@@ -97,6 +97,11 @@ class DI {
 		this.builder = builder;
 
 		this.loader = new canister.definitionLoader.YAML();
+		this.injector = new canister.definitionLoader.Value();
+	}
+
+	inject(name, value) {
+		this.injector.component(name, value);
 	}
 
 	build() {
@@ -111,6 +116,10 @@ class DI {
 		}
 
 		for (let definition of parser.parse(env.toJS())) {
+			this.builder.addDefinition(definition);
+		}
+
+		for (let definition of parser.parse(this.injector.toJS())) {
 			this.builder.addDefinition(definition);
 		}
 

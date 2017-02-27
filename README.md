@@ -168,6 +168,22 @@ components:
         name: someApi
 ```
 
+## Injecting components for testing
+
+It is possible to inject values into the container definition before the system is built. This technique should be used during testing only.
+
+```nodejs
+const Microbe = require('uw-microbe.js');
+
+const system = new Microbe(__dirname);
+
+system.configure('./wiring.yml');
+
+system.di.inject('my.id', new Object('oi!'));
+
+system.build();
+```
+
 ## Behaviour
 
 ```
