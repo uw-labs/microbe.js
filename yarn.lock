@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@utilitywarehouse/uw-lib-auth.js@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-auth.js/-/uw-lib-auth.js-1.2.0.tgz#543b5a522373b8f82b7343b9727322e92da9b080"
+"@utilitywarehouse/uw-lib-auth.js@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-auth.js/-/uw-lib-auth.js-1.2.2.tgz#9fefd6356799c415391fc349d01ab006d179efb2"
   dependencies:
     async "^2.1.2"
     jsonwebtoken "^7.1.9"
