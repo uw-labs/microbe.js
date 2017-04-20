@@ -172,4 +172,24 @@ describe('Microbe', function() {
 				done();
 			});
 	})
+	it('attaches a provided request ID to the request object', function(done) {
+		const requestId = '79d9e89d-1b2e-4b2b-9184-b51668b223d1';
+		this.system.route().get('/', (req, res) => {
+			expect(req.id).to.equal(requestId);
+			res.end()
+		})
+		request(this.system.server)
+			.get('/')
+			.set({'X-Request-ID': requestId})
+			.expect(200, done)
+	})
+	it('attaches a generated request ID to the request object if one is not provided', function(done) {
+		this.system.route().get('/', (req, res) => {
+			expect(req.id).to.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/);
+			res.end()
+		})
+		request(this.system.server)
+			.get('/')
+			.expect(200, done)
+	})
 })

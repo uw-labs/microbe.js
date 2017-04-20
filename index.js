@@ -171,7 +171,8 @@ module.exports = class Microbe {
 		this.logger = this.container.get('logger');
 
 		this.server.use((req, res, next) => {
-			req.logger = this.logger.child({r: uuid.v4(), id: (req.header('x-request-id') || uuid.v4())});
+			req.id = req.header('x-request-id') || uuid.v4();
+			req.logger = this.logger.child({r: uuid.v4(), id: req.id});
 			next();
 		});
 
