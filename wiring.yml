@@ -38,6 +38,8 @@ components:
     class: 'express::Router'
   server:
     factory: 'express'
+  server.middleware:
+    factory: 'helmet'
   bus:
     class: 'director.js'
     call:

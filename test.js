@@ -29,6 +29,7 @@ describe('Microbe', function() {
 		}]
 		this.system.container.get('logger').level(0);
 	});
+
 	describe('exposes operational endpoints at', function() {
 		it('/__/about', function(done) {
 			request(this.system.server)
@@ -40,11 +41,13 @@ describe('Microbe', function() {
 				})
 				.end(done)
 		})
+
 		it('/__/ready', function(done) {
 			request(this.system.server)
 				.get('/__/ready')
 				.expect(200, 'ready\n', done)
 		})
+
 		it('/__/health', function(done) {
 			this.system.health('check', r => r.healthy('ok'))
 			request(this.system.server)
@@ -56,12 +59,34 @@ describe('Microbe', function() {
 				})
 				.end(done)
 		})
+
 		it('/__/metrics', function(done) {
 			request(this.system.server)
 				.get('/__/metrics')
 				.expect(200, done)
 		})
 	})
+
+	it('sends security headers', function (done) {
+		request(this.system.server)
+			.get('/__/about')
+			.expect(200)
+			.expect(function (res) {
+				const headers = res.headers;
+
+				expect(headers['x-dns-prefetch-control']).to.equal('off', 'x-dns-prefetch-control');
+				expect(headers['x-frame-options']).to.equal('SAMEORIGIN', 'x-frame-options');
+				expect(headers['x-powered-by']).to.equal(undefined, 'x-powered-by');
+				expect(headers['strict-transport-security']).to.equal(
+					'max-age=15552000; includeSubDomains', 'strict-transport-security'
+				);
+				expect(headers['x-download-options']).to.equal('noopen', 'x-download-options');
+				expect(headers['x-content-type-options']).to.equal('nosniff', 'x-content-type-options');
+				expect(headers['x-xss-protection']).to.equal('1; mode=block', 'x-xss-protection');
+			})
+			.end(done)
+	});
+
 	it('sets up default instrumentation', function(done) {
 
 		const prom = this.system.container.get('instrumentation');
@@ -78,10 +103,12 @@ describe('Microbe', function() {
 			.expect(/http_request_seconds/)
 			.end(done)
 	})
+
 	describe('provides a logger that   ', function() {
 		it('is namespaced with app name', function() {
 			expect(this.system.container.get('logger').fields).to.have.property('name', pkg.name)
 		})
+
 		it('attaches to req.logger with correlation id (id) and request id (r)', function(done) {
 			this.system.route().get('/', (req, res) => {
 				res.json(req.logger.fields);
@@ -95,6 +122,7 @@ describe('Microbe', function() {
 				})
 				.end(done)
 		})
+
 		it('logs requests', function(done) {
 			this.system.route().get('/', (req, res) => {
 				res.end()
@@ -107,6 +135,7 @@ describe('Microbe', function() {
 					done();
 				})
 		})
+
 		it('logs errors with stacks and previous errors', function(done) {
 			this.system.route().get('/', (req, res) => {
 				const e = new Error('ERROR');
@@ -123,6 +152,7 @@ describe('Microbe', function() {
 				})
 		})
 	})
+
 	it('renders errors with error.status and error.message only with http status matching error.status', function(done) {
 		this.system.route().get('/', (req, res) => {
 			const e = error('NotFoundError', 400);
@@ -138,6 +168,7 @@ describe('Microbe', function() {
 				done();
 			});
 	});
+
 	it('renders 500/Internal Server Error when no error.status / error.message', function(done) {
 		this.system.route().get('/', (req, res) => {
 			throw new Error();
@@ -151,6 +182,7 @@ describe('Microbe', function() {
 				done();
 			});
 	});
+
 	it('can run before() and after() middleware', function(done) {
 		let result = '';
 		this.system.before((req, res, next) => {
@@ -172,6 +204,7 @@ describe('Microbe', function() {
 				done();
 			});
 	})
+
 	it('attaches a provided request ID to the request object', function(done) {
 		const requestId = '79d9e89d-1b2e-4b2b-9184-b51668b223d1';
 		this.system.route().get('/', (req, res) => {
@@ -183,6 +216,7 @@ describe('Microbe', function() {
 			.set({'X-Request-ID': requestId})
 			.expect(200, done)
 	})
+
 	it('attaches a generated request ID to the request object if one is not provided', function(done) {
 		this.system.route().get('/', (req, res) => {
 			expect(req.id).to.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/);

@@ -155,6 +155,8 @@ module.exports = class Microbe {
 
 		this.server = this.container.get('server');
 
+		this.server.use(this.container.get('server.middleware'));
+
 		this.server.use('/__/about', this.container.get('operational.about').handler);
 		this.server.use('/__/health', this.container.get('operational.health').handler);
 		this.server.use('/__/ready', this.container.get('operational.ready').handler);
