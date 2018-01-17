@@ -111,7 +111,7 @@ Where a start/stop method rejects the entire chain will be rejected.
 ## Monitoring
 
 Microbe can monitor your infrastructure connections and have state pumped onto logger, instrumentation and health endpoints. 
-There are only two types of events recognised, `connected` and `disconnected` and any instance provided for monitoring is required to raise those. 
+There are only two types of events recognised, `connect` and `disconnect` and any instance provided for monitoring is required to raise those.
 Patch methods for redis and mongo are available and will translate events to the required pair. The endpoint patch method will translate `available` and `unavailable` events.
 
 Definition:
@@ -140,7 +140,7 @@ components:
 
 Syntax:
 
-- `type` - optional, endpoint, redis or mongo, if left blank it will try to monitor connected/disconnected events on passed instance
+- `type` - optional, endpoint, redis or mongo, if left blank it will try to monitor connect/disconnect events on passed instance
 - `prop` - optional, the prop of the service where the events are emitted from, this is required  because we often have wrappers around connection objects
 - `name` - optional, arbitrary name, will be used as label in any output type - defaults to component definition id (service name)
 - `required` - optional, if set to true and connection is down it will report system as unhealthy in health checks, default is false
