@@ -23,9 +23,9 @@
   dependencies:
     axios "^0.15.3"
 
-"@utilitywarehouse/uw-lib-error.js@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-error.js/-/uw-lib-error.js-1.0.1.tgz#2c3b3463c0ccb844a7aa8fa97792d3ae56806a92"
+"@utilitywarehouse/uw-lib-error.js@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@utilitywarehouse/uw-lib-error.js/-/uw-lib-error.js-1.0.2.tgz#7d4f7dfc26d1d9de721652caeefdde05c64f7e17"
   dependencies:
     uuid "^3.0.1"
 
