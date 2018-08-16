@@ -38,6 +38,9 @@ components:
     class: 'express::Router'
   server:
     factory: 'express'
+  transport:
+    factory: 'http::createServer'
+    with: ['@server']
   server.middleware:
     factory: 'helmet'
   bus:

@@ -154,6 +154,7 @@ module.exports = class Microbe {
 		this.name = this.container.get('package').name;
 
 		this.server = this.container.get('server');
+		this.transport = this.container.get('transport');
 
 		this.server.use(this.container.get('server.middleware'));
 
@@ -220,7 +221,7 @@ module.exports = class Microbe {
 	}
 
 	start(port) {
-		this.server.listen(port, () => {
+		this.transport.listen(port, () => {
 			this.logger.info(`${this.name} listening on http://0.0.0.0:${port}`);
 		});
 	}
