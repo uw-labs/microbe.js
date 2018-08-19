@@ -311,9 +311,9 @@ camelize@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/camelize/-/camelize-1.0.0.tgz#164a5483e630fa4321e5af07020e531831b2609b"
 
-canister.js@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/canister.js/-/canister.js-1.8.0.tgz#ed6163bb657dda5aa9134afeb9964d06ff52de20"
+canister.js@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/canister.js/-/canister.js-1.8.1.tgz#2ebe40ced71ad8d7a98f8ab96e4e5d396a11736e"
   dependencies:
     dependency-graph "^0.5.0"
     js-yaml "^3.7.0"
