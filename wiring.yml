@@ -10,6 +10,8 @@ components:
       - method: newGauge
         with: ['infrastructure_accessible', 'reports when infra is up/down', ['probe']]
       - method: newGauge
+        with: ['healthcheck_status', 'reports healthcheck result', ['healthcheck_name', 'healthcheck_result']]
+      - method: newGauge
         with: ['nodejs_memory_heap_used_bytes', 'process.memoryUsage().heapUsed']
       - method: newGauge
         with: ['nodejs_memory_heap_total_bytes', 'process.memoryUsage().heapTotal']
@@ -61,6 +63,7 @@ components:
       - 'infrastructure_accessible'
       - '@operational.health'
       - '@canister'
+      - 'healthcheck_status'
     tags:
       system.start:
         priority: 99999999

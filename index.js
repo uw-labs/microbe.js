@@ -23,7 +23,7 @@ class MonitorDICycle {
 			const name = t.name || d.id;
 			const type = t.type;
 			const isRequired = t.required || false;
-			const isInitiallyConnected = typeof t.initiallyConnected === 'undefined' ? true : !!t.initiallyConnected;
+			const isInitiallyConnected = typeof t.initiallyConnected === 'undefined' ? true : Boolean(t.initiallyConnected);
 
 			yield canister.Definition.structure({serviceId, prop, name, type, isRequired, isInitiallyConnected});
 		}
