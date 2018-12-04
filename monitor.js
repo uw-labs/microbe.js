@@ -5,7 +5,8 @@ module.exports = class {
 		instrumentation,
 		metric,
 		healthCheck,
-		container
+		container,
+		healthCheckMetric,
 	) {
 		this.container = container;
 		this.monitor = monitor;
@@ -13,6 +14,7 @@ module.exports = class {
 		this.metric = instrumentation.metric(metric);
 		this.healthCheck = healthCheck;
 		this.config = [];
+		this.healthCheckMetric = instrumentation.metric(healthCheckMetric);
 	}
 
 	register({serviceId, prop, type, name, isRequired, isInitiallyConnected}) {
@@ -58,12 +60,29 @@ module.exports = class {
 				p.on('connected', () => {
 					this.logger.info({probe: p.name}, `${p.name} connected.`)
 					this.metric.set({probe: p.name}, 1)
+
+					this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "unhealthy"}, 0)
+					this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "degraded"}, 0)
+					this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "healthy"}, 1)
+
 				});
 				p.on('disconnected', (event) => {
 					let reason = event ? event.message : '';
 					this.logger.info({probe: p.name, reason}, `${p.name} disconnected.`)
 					this.metric.set({probe: p.name}, 0)
+
+					if (p.isRequired) {
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "unhealthy"}, 1)
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "degraded"}, 0)
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "healthy"}, 0)
+					} else {
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "unhealthy"}, 0)
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "degraded"}, 1)
+						this.healthCheckMetric.set({healthcheck_name: p.name, healthcheck_result: "healthy"}, 0)
+					}
+
 				});
+
 				this.healthCheck.addCheck(p.name, (r) => {
 					let reason = p.details && p.details.message ? p.details.message : '';
 					if (!p.connected && p.isRequired) {
