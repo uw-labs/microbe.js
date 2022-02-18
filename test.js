@@ -82,7 +82,7 @@ describe('Microbe', function() {
 				);
 				expect(headers['x-download-options']).to.equal('noopen', 'x-download-options');
 				expect(headers['x-content-type-options']).to.equal('nosniff', 'x-content-type-options');
-				expect(headers['x-xss-protection']).to.equal('1; mode=block', 'x-xss-protection');
+				expect(headers['x-xss-protection']).to.equal('0');
 			})
 			.end(done)
 	});
