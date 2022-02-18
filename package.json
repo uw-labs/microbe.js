@@ -1,7 +1,7 @@
 {
   "name": "@utilitywarehouse/microbe.js",
   "description": "Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.",
-  "version": "2.4.3",
+  "version": "2.5.0",
   "main": "index.js",
   "scripts": {
     "test": "make test",
@@ -18,26 +18,25 @@
   },
   "homepage": "https://github.com/utilitywarehouse/uw-microbe.js#readme",
   "dependencies": {
-    "@utilitywarehouse/uw-lib-auth.js": "^1.2.3",
-    "@utilitywarehouse/uw-lib-authz.js": "^1.0.0",
+    "@utilitywarehouse/uw-lib-auth.js": "^1.2.4",
+    "@utilitywarehouse/uw-lib-authz.js": "^1.0.1",
     "@utilitywarehouse/uw-lib-connection-monitor.js": "^1.0.4",
-    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.3",
-    "@utilitywarehouse/uw-lib-error.js": "^1.0.2",
-    "@utilitywarehouse/uw-lib-logger.js": "^1.1.5",
-    "@utilitywarehouse/uw-lib-operational.js": "^1.0.0",
-    "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.9",
+    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.4",
+    "@utilitywarehouse/uw-lib-error.js": "^1.0.3",
+    "@utilitywarehouse/uw-lib-logger.js": "^1.1.6",
+    "@utilitywarehouse/uw-lib-operational.js": "^1.0.2",
+    "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.10",
     "async.eachseries": "^0.5.2",
     "canister.js": "^1.8.1",
     "director.js": "^1.2.0",
-    "express": "^4.14.0",
-    "helmet": "^3.9.0",
-    "uuid": "^3.0.1"
+    "express": "^4.17.3",
+    "helmet": "^5.0.2",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "supertest": "^2.0.1",
-    "xo": "^0.17.1"
+    "chai": "^4.3.6",
+    "mocha": "^9.2.0",
+    "supertest": "^6.2.2"
   },
   "publishConfig": {
     "access": "public"

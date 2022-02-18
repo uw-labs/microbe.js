@@ -130,8 +130,8 @@ describe('Microbe', function() {
 			request(this.system.server)
 				.get('/')
 				.end(() => {
-					expect(this.log[0]).to.have.deep.property('req.method', 'GET')
-					expect(this.log[0]).to.have.deep.property('req.url', '/')
+					expect(this.log[0].req.method).to.eql('GET')
+					expect(this.log[0].req.url).to.eql('/')
 					done();
 				})
 		})
@@ -145,9 +145,9 @@ describe('Microbe', function() {
 			request(this.system.server)
 				.get('/')
 				.end((err, res) => {
-					expect(this.log[1]).to.have.deep.property('error.message', 'ERROR');
-					expect(this.log[1]).to.have.deep.property('error.stack');
-					expect(this.log[1]).to.have.deep.property('error.previous.message', 'PREVIOUS');
+					expect(this.log[1].error.message).to.eql('ERROR');
+					expect(this.log[1].error).to.have.property('stack')
+					expect(this.log[1].error.previous.message).to.eql('PREVIOUS');
 					done();
 				})
 		})
