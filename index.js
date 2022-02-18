@@ -1,6 +1,6 @@
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const canister = require('canister.js');
+const canister = require('@utilitywarehouse/canister.js');
 
 class MonitorDICycle {
 	execute(builder) {
