@@ -18,14 +18,14 @@
   },
   "homepage": "https://github.com/utilitywarehouse/uw-microbe.js#readme",
   "dependencies": {
-    "@utilitywarehouse/uw-lib-auth.js": "^1.2.3",
-    "@utilitywarehouse/uw-lib-authz.js": "^1.0.0",
+    "@utilitywarehouse/uw-lib-auth.js": "^1.2.4",
+    "@utilitywarehouse/uw-lib-authz.js": "^1.0.1",
     "@utilitywarehouse/uw-lib-connection-monitor.js": "^1.0.4",
-    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.3",
-    "@utilitywarehouse/uw-lib-error.js": "^1.0.2",
-    "@utilitywarehouse/uw-lib-logger.js": "^1.1.5",
-    "@utilitywarehouse/uw-lib-operational.js": "^1.0.0",
-    "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.9",
+    "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.4",
+    "@utilitywarehouse/uw-lib-error.js": "^1.0.3",
+    "@utilitywarehouse/uw-lib-logger.js": "^1.1.6",
+    "@utilitywarehouse/uw-lib-operational.js": "^1.0.2",
+    "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.10",
     "async.eachseries": "^0.5.2",
     "canister.js": "^1.8.1",
     "director.js": "^1.2.0",
@@ -34,10 +34,9 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "supertest": "^2.0.1",
-    "xo": "^0.17.1"
+    "chai": "^4.3.6",
+    "mocha": "^9.2.0",
+    "supertest": "^6.2.2"
   },
   "publishConfig": {
     "access": "public"
