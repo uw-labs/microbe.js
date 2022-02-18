@@ -1,5 +1,5 @@
 const path = require('path');
-const uuid = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const canister = require('canister.js');
 
 class MonitorDICycle {
@@ -174,8 +174,8 @@ module.exports = class Microbe {
 		this.logger = this.container.get('logger');
 
 		this.server.use((req, res, next) => {
-			req.id = req.header('x-request-id') || uuid.v4();
-			req.logger = this.logger.child({r: uuid.v4(), id: req.id});
+			req.id = req.header('x-request-id') || uuidv4();
+			req.logger = this.logger.child({r: uuidv4(), id: req.id});
 			next();
 		});
 
