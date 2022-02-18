@@ -23,7 +23,7 @@
     "@utilitywarehouse/uw-lib-connection-monitor.js": "^1.0.4",
     "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.0.4",
     "@utilitywarehouse/uw-lib-error.js": "^1.0.3",
-    "@utilitywarehouse/uw-lib-logger.js": "^1.1.6",
+    "@utilitywarehouse/uw-lib-logger.js": "^1.1.7",
     "@utilitywarehouse/uw-lib-operational.js": "^1.0.2",
     "@utilitywarehouse/uw-lib-prometheus.js": "^1.0.10",
     "async.eachseries": "^0.5.2",
