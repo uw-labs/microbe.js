@@ -1,53 +1,63 @@
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-const canister = require('@utilitywarehouse/canister.js');
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const canister = require("@utilitywarehouse/canister.js");
 
 class MonitorDICycle {
 	execute(builder) {
-		const monitorDefinition = builder.getDefinitionById('system.monitor');
+		const monitorDefinition = builder.getDefinitionById("system.monitor");
 
 		for (let callDetails of this.tags(builder)) {
 			monitorDefinition.addCall(
-				canister.Definition.call('register', callDetails)
+				canister.Definition.call("register", callDetails)
 			);
 		}
 	}
 
-	* tags(builder) {
-		const definitions = builder.getDefinitionsByTag('system.monitor');
+	*tags(builder) {
+		const definitions = builder.getDefinitionsByTag("system.monitor");
 		for (let d of definitions) {
-			let t = d.getTag('system.monitor').value;
+			let t = d.getTag("system.monitor").value;
 
 			const serviceId = d.id;
 			const prop = t.prop;
 			const name = t.name || d.id;
 			const type = t.type;
 			const isRequired = t.required || false;
-			const isInitiallyConnected = typeof t.initiallyConnected === 'undefined' ? true : Boolean(t.initiallyConnected);
+			const isInitiallyConnected =
+				typeof t.initiallyConnected === "undefined"
+					? true
+					: Boolean(t.initiallyConnected);
 
-			yield canister.Definition.structure({serviceId, prop, name, type, isRequired, isInitiallyConnected});
+			yield canister.Definition.structure({
+				serviceId,
+				prop,
+				name,
+				type,
+				isRequired,
+				isInitiallyConnected,
+			});
 		}
 	}
 }
 
 class LifecycleDICycle {
 	execute(builder) {
-		const cycleDefinition = builder.getDefinitionById('system.lifecycle');
+		const cycleDefinition = builder.getDefinitionById("system.lifecycle");
 
-		for (let callDetails of this.cycleByTag(builder, 'system.start')) {
+		for (let callDetails of this.cycleByTag(builder, "system.start")) {
 			cycleDefinition.addCall(
-				canister.Definition.call('registerStart', ...callDetails)
+				canister.Definition.call("registerStart", ...callDetails)
 			);
 		}
 
-		for (let callDetails of this.cycleByTag(builder, 'system.stop')) {
+		for (let callDetails of this.cycleByTag(builder, "system.stop")) {
 			cycleDefinition.addCall(
-				canister.Definition.call('registerStop', ...callDetails)
+				canister.Definition.call("registerStop", ...callDetails)
 			);
 		}
 	}
 
-	* cycleByTag(builder, tag) {
+	*cycleByTag(builder, tag) {
 		const startDefinitions = builder.getDefinitionsByTag(tag);
 		for (let d of startDefinitions) {
 			let t = d.getTag(tag).value;
@@ -83,7 +93,7 @@ class DI {
 
 		const yamlLoader = new canister.definitionLoader.YAML();
 
-		yamlLoader.fromFile(path.join(__dirname, './wiring.yml'));
+		yamlLoader.fromFile(path.join(__dirname, "./wiring.yml"));
 
 		const parser = new canister.Parser(__dirname);
 
@@ -123,20 +133,16 @@ class DI {
 			this.builder.addDefinition(definition);
 		}
 
-		const preRouter = this.builder.getDefinitionById('pre.router');
+		const preRouter = this.builder.getDefinitionById("pre.router");
 
-		this.builder.getDefinitionsByTag('before.router').forEach(definition => {
-			preRouter.addCall(
-				canister.Definition.call('use', definition)
-			);
+		this.builder.getDefinitionsByTag("before.router").forEach((definition) => {
+			preRouter.addCall(canister.Definition.call("use", definition));
 		});
 
-		const postRouter = this.builder.getDefinitionById('post.router');
+		const postRouter = this.builder.getDefinitionById("post.router");
 
-		this.builder.getDefinitionsByTag('after.router').forEach(definition => {
-			postRouter.addCall(
-				canister.Definition.call('use', definition)
-			);
+		this.builder.getDefinitionsByTag("after.router").forEach((definition) => {
+			postRouter.addCall(canister.Definition.call("use", definition));
 		});
 
 		return this.builder.build();
@@ -151,66 +157,79 @@ module.exports = class Microbe {
 	build() {
 		this.container = this.di.build();
 
-		this.name = this.container.get('package').name;
+		this.name = this.container.get("package").name;
 
-		this.server = this.container.get('server');
-		this.transport = this.container.get('transport');
+		this.server = this.container.get("server");
+		this.transport = this.container.get("transport");
 
-		this.server.use(this.container.get('server.middleware'));
+		this.server.use(this.container.get("server.middleware"));
 
-		this.server.use('/__/about', this.container.get('operational.about').handler);
-		this.server.use('/__/health', this.container.get('operational.health').handler);
-		this.server.use('/__/ready', this.container.get('operational.ready').handler);
+		this.server.use(
+			"/__/about",
+			this.container.get("operational.about").handler
+		);
+		this.server.use(
+			"/__/health",
+			this.container.get("operational.health").handler
+		);
+		this.server.use(
+			"/__/ready",
+			this.container.get("operational.ready").handler
+		);
 
-		const promMiddleware = this.container.get('instrumentation').middleware();
+		const promMiddleware = this.container.get("instrumentation").middleware();
 
 		this.server.get(
-			'/__/metrics',
-			promMiddleware.heapUsage('nodejs_memory_heap_used_bytes', 'nodejs_memory_heap_total_bytes'),
+			"/__/metrics",
+			promMiddleware.heapUsage(
+				"nodejs_memory_heap_used_bytes",
+				"nodejs_memory_heap_total_bytes"
+			),
 			promMiddleware.report()
 		);
-		this.server.use(promMiddleware.requestDuration('http_request_seconds'));
+		this.server.use(promMiddleware.requestDuration("http_request_seconds"));
 
-		this.logger = this.container.get('logger');
+		this.logger = this.container.get("logger");
 
 		this.server.use((req, res, next) => {
-			req.id = req.header('x-request-id') || uuidv4();
-			req.logger = this.logger.child({r: uuidv4(), id: req.id});
+			req.id = req.header("x-request-id") || uuidv4();
+			req.logger = this.logger.child({ r: uuidv4(), id: req.id });
 			next();
 		});
 
 		this.server.use((req, res, next) => {
-			(req.logger || this.logger).trace({req});
+			(req.logger || this.logger).trace({ req });
 			next();
 		});
 
-		this.bus = this.container.get('bus');
+		this.bus = this.container.get("bus");
 
-		this.router = this.container.get('router');
-		this.pre = this.container.get('pre.router');
-		this.post = this.container.get('post.router');
+		this.router = this.container.get("router");
+		this.pre = this.container.get("pre.router");
+		this.post = this.container.get("post.router");
 
 		this.server.use(this.pre);
 		this.server.use(this.router);
 		this.server.use(this.post);
 
 		this.server.use((error, req, res, next) => {
-			(req.logger || this.logger).error({error});
+			(req.logger || this.logger).error({ error });
 			next(error);
 		});
 
 		this.server.use((error, req, res, next) => {
 			const err = {
 				status: error.status || 500,
-				type: error.type || (error.name || 'ServerError'),
-				message: error.message || 'Internal Server Error',
-				reference: error.reference
+				type: error.type || error.name || "ServerError",
+				message: error.message || "Internal Server Error",
+				reference: error.reference,
 			};
 			res.status(err.status).json(err);
 			next(error);
 		});
 
-		this.server.use((error, req, res, next) => { // eslint-disable-line no-unused-vars
+		this.server.use((error, req, res, next) => {
+			// eslint-disable-line no-unused-vars
 			// no more error chainging
 			return;
 		});
@@ -239,19 +258,19 @@ module.exports = class Microbe {
 	}
 
 	health(name, middleware) {
-		this.container.get('operational.health').addCheck(name, middleware);
+		this.container.get("operational.health").addCheck(name, middleware);
 	}
 
 	ready(middleware) {
-		this.container.get('operational.ready').onCall(middleware);
+		this.container.get("operational.ready").onCall(middleware);
 	}
 
 	bootstrap() {
-		return this.container.get('system.lifecycle').start();
+		return this.container.get("system.lifecycle").start();
 	}
 
 	teardown() {
-		return this.container.get('system.lifecycle').stop();
+		return this.container.get("system.lifecycle").stop();
 	}
 
 	get(service) {
