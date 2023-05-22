@@ -5,6 +5,8 @@ const Microbe = require(".");
 const expect = chai.expect;
 const pkg = require("./package.json");
 const error = require("@utilitywarehouse/uw-lib-error.js");
+const logger = require("@utilitywarehouse/uw-lib-logger.js");
+const fs = require('fs');
 
 class LoggerStream extends stream.Writable {
 	constructor(data) {
@@ -22,15 +24,7 @@ describe("Microbe", function () {
 	beforeEach(function () {
 		this.system = new Microbe();
 		this.system.build();
-		this.log = [];
-		this.system.container.get("logger").streams = [
-			{
-				type: "raw",
-				stream: new LoggerStream(this.log),
-				raw: true,
-			},
-		];
-		this.system.container.get("logger").level(0);
+		this.system.container.get("logger").level = 'silent';
 	});
 
 	describe("exposes operational endpoints at", function () {
@@ -116,64 +110,100 @@ describe("Microbe", function () {
 	});
 
 	describe("provides a logger that   ", function () {
+		beforeEach(async function () {
+			if (fs.existsSync('./test.log')) {
+				await fs.unlinkSync('./test.log');
+			}
+
+			this.system = new Microbe();
+			const inj = logger({
+				name: pkg.name,
+				level: 'trace',
+				transport: {
+					targets: [
+						{
+							level: 'trace',
+							target: 'pino/file',
+							options: { destination: './test.log', sync: true }
+						},
+					]
+				}
+			})
+			this.system.di.inject('logger', inj)
+			this.system.build();
+		})
+
 		it("is namespaced with app name", function () {
-			expect(this.system.container.get("logger").fields).to.have.property(
+			expect(this.system.container.get("logger").bindings()).to.have.property(
 				"name",
 				pkg.name
 			);
 		});
 
 		it("attaches to req.logger with correlation id (id) and request id (r)", function (done) {
-			this.system.route().get("/", (req, res) => {
-				res.json(req.logger.fields);
+			this.system.route().get("/logger", (req, res) => {
+				res.json(req.logger.bindings());
 			});
 			request(this.system.server)
-				.get("/")
+				.get("/logger")
 				.expect(200)
 				.expect(function (res) {
 					expect(res.body).to.have.property("id");
 					expect(res.body).to.have.property("r");
 				})
-				.end(done);
+				.end(function () {
+					setTimeout(done, 100);
+				});
 		});
 
 		it("logs requests", function (done) {
-			this.system.route().get("/", (req, res) => {
+			this.system.route().get("/request", (req, res) => {
 				res.end();
 			});
 			request(this.system.server)
-				.get("/")
-				.end(() => {
-					expect(this.log[0].req.method).to.eql("GET");
-					expect(this.log[0].req.url).to.eql("/");
-					done();
+				.get("/request")
+				.end(function () {
+					setTimeout(() => { // pino writes async; wait for file to be complete
+						fs.readFile("./test.log", "utf-8", (err, data) => {
+							const log = JSON.parse(data)
+							expect(log.req.method).to.eql("GET")
+							expect(log.req.url).to.eql("/request");
+							done();
+						})
+					}, 100);
 				});
 		});
 
 		it("logs errors with stacks and previous errors", function (done) {
-			this.system.route().get("/", (req, res) => {
+			this.system.route().get("/errors", (req, res) => {
 				const e = new Error("ERROR");
 				e.previous = new Error("PREVIOUS");
 				throw e;
 			});
 			request(this.system.server)
-				.get("/")
+				.get("/errors")
 				.end((err, res) => {
-					expect(this.log[1].error.message).to.eql("ERROR");
-					expect(this.log[1].error).to.have.property("stack");
-					expect(this.log[1].error.previous.message).to.eql("PREVIOUS");
-					done();
+					setTimeout(() => { // pino writes async; wait for file to be complete
+						fs.readFile("./test.log", "utf-8", (err, data) => {
+							const log = data.split("\n").filter(t => t).map(JSON.parse)
+
+							expect(log[1].error.message).to.eql("ERROR");
+							expect(log[1].error).to.have.property("stack");
+							expect(log[1].error.previous.message).to.eql("PREVIOUS");
+							done();
+						})
+					}, 100);
 				});
 		});
 	});
 
 	it("renders errors with error.status and error.message only with http status matching error.status", function (done) {
-		this.system.route().get("/", (req, res) => {
+		this.system.route().get("/notFound", (req, res) => {
 			const e = error("NotFoundError", 400);
 			throw new e("na-ah");
 		});
 		request(this.system.server)
-			.get("/")
+			.get("/notFound")
 			.end((err, res) => {
 				expect(res.body).to.have.property("message", "na-ah");
 				expect(res.body).to.have.property("status", 400);
@@ -184,11 +214,11 @@ describe("Microbe", function () {
 	});
 
 	it("renders 500/Internal Server Error when no error.status / error.message", function (done) {
-		this.system.route().get("/", (req, res) => {
+		this.system.route().get("/internal", (req, res) => {
 			throw new Error();
 		});
 		request(this.system.server)
-			.get("/")
+			.get("/internal")
 			.end((err, res) => {
 				expect(res.body).to.have.property("message", "Internal Server Error");
 				expect(res.body).to.have.property("status", 500);
@@ -203,7 +233,7 @@ describe("Microbe", function () {
 			result = result + "before.";
 			next();
 		});
-		this.system.route().get("/", (req, res, next) => {
+		this.system.route().get("/route", (req, res, next) => {
 			result = result + "route.";
 			next();
 		});
@@ -212,7 +242,7 @@ describe("Microbe", function () {
 			res.end();
 		});
 		request(this.system.server)
-			.get("/")
+			.get("/route")
 			.end((err, res) => {
 				expect(result).to.equal("before.route.after");
 				done();
@@ -221,23 +251,23 @@ describe("Microbe", function () {
 
 	it("attaches a provided request ID to the request object", function (done) {
 		const requestId = "79d9e89d-1b2e-4b2b-9184-b51668b223d1";
-		this.system.route().get("/", (req, res) => {
+		this.system.route().get("/provided-id", (req, res) => {
 			expect(req.id).to.equal(requestId);
 			res.end();
 		});
 		request(this.system.server)
-			.get("/")
+			.get("/provided-id")
 			.set({ "X-Request-ID": requestId })
 			.expect(200, done);
 	});
 
 	it("attaches a generated request ID to the request object if one is not provided", function (done) {
-		this.system.route().get("/", (req, res) => {
+		this.system.route().get("/gen-id", (req, res) => {
 			expect(req.id).to.match(
 				/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
 			);
 			res.end();
 		});
-		request(this.system.server).get("/").expect(200, done);
+		request(this.system.server).get("/gen-id").expect(200, done);
 	});
 });
