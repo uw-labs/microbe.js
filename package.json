@@ -1,7 +1,7 @@
 {
   "name": "@utilitywarehouse/microbe.js",
   "description": "Microbe is an abstraction for the repetitive task of setting basic express infrastructure each time we bring up another μService.",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "main": "index.js",
   "scripts": {
     "test": "make test",
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/utilitywarehouse/uw-microbe.js#readme",
   "dependencies": {
-    "@utilitywarehouse/canister.js": "^2.0.3",
+    "@utilitywarehouse/canister.js": "^2.1.0",
     "@utilitywarehouse/uw-lib-connection-monitor.js": "^1.0.4",
     "@utilitywarehouse/uw-lib-endpoint-monitor.js": "^1.1.0",
     "@utilitywarehouse/uw-lib-error.js": "^1.0.4",
